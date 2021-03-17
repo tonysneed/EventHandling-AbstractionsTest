@@ -2,8 +2,14 @@
 
 namespace AbstractionsTest.Abstractions
 {
-    public abstract class EventHandler : IEventHandler
+    public abstract class EventHandler<TEvent> : IEventHandler<TEvent>
+        where TEvent : IEvent
     {
-        public abstract Task HandleAsync(IEvent @event);
+        public virtual Task HandleAsync(IEvent @event)
+        {
+            return HandleAsync((TEvent)@event);
+        }
+
+        public abstract Task HandleAsync(TEvent @event);
     }
 }

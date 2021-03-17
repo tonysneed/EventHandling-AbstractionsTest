@@ -1,7 +1,6 @@
 ﻿using AbstractionsTest.Abstractions;
 using AbstractionsTest.Models;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 
 namespace AbstractionsTest
@@ -17,25 +16,44 @@ namespace AbstractionsTest
                 new WeatherForecast(DateTime.Now, 100, "boiling"),
             };
 
-            IEvent @event = new WeatherForecastEvent(weatherForecasts);
-            var events = new List<IEvent> { @event };
+            IEvent forecastEvent = new WeatherForecastEvent(weatherForecasts);
+            IEvent reportEvent = new WeatherReportEvent(weatherForecasts);
+            var events = new List<IEvent> { forecastEvent, reportEvent };
 
-            foreach (var item in events.OfType<WeatherForecastEvent>())
+            foreach (var @event in events)
             {
-                Console.WriteLine($"Event Id {item.Id} created at {item.CreationDate.ToShortTimeString()}");
-                foreach (var weather in item.WeatherForecasts)
+                Console.WriteLine($"\n{@event.GetType().Name}: Event Id {@event.Id} created at {@event.CreationDate.ToShortTimeString()}");
+                if (@event is WeatherForecastEvent _forecastEvent)
                 {
-                    Console.WriteLine($"{weather.Summary}: {weather.TemperatureC} C, {weather.TemperatureF} F");
+                    foreach (var weather in _forecastEvent.WeatherForecasts)
+                    {
+                        Console.WriteLine($"Forecast: {weather.Summary}: {weather.TemperatureC} C, {weather.TemperatureF} F");
+                    }
+                }
+                if (@event is WeatherReportEvent _reportEvent)
+                {
+                    foreach (var weather in _reportEvent.WeatherForecasts)
+                    {
+                        Console.WriteLine($"Report: {weather.Summary}: {weather.TemperatureC} C, {weather.TemperatureF} F");
+                    }
                 }
             }
 
             Console.WriteLine("\nHandlers ...");
-            IEventHandler handler = new WeatherForecastEventHandler();
-            var handlers = new List<IEventHandler> { handler };
+            var forecastHandler = new WeatherForecastEventHandler();
+            var reportHandler = new WeatherReportEventHandler();
+            var handlers = new List<IEventHandler> { forecastHandler, reportHandler };
 
-            foreach (var item in handlers)
+            foreach (var handler in handlers)
             {
-                item.HandleAsync(@event);
+                if (handler is IEventHandler<WeatherForecastEvent>)
+                {
+                    handler.HandleAsync(forecastEvent);
+                }
+                if (handler is IEventHandler<WeatherReportEvent>)
+                {
+                    handler.HandleAsync(reportEvent);
+                }
             }
         }
     }

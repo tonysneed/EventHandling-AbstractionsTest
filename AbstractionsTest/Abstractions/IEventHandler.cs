@@ -6,4 +6,10 @@ namespace AbstractionsTest.Abstractions
     {
         Task HandleAsync(IEvent @event);
     }
+
+    public interface IEventHandler<in TEvent> : IEventHandler
+        where TEvent: IEvent
+    {
+        Task HandleAsync(TEvent @event);
+    }
 }

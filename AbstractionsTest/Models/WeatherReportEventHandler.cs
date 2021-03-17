@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 
 namespace AbstractionsTest.Models
 {
-    public class WeatherForecastEventHandler : Abstractions.EventHandler<WeatherForecastEvent>
+    public class WeatherReportEventHandler : Abstractions.EventHandler<WeatherReportEvent>
     {
-        public override Task HandleAsync(WeatherForecastEvent @event)
+        public override Task HandleAsync(WeatherReportEvent @event)
         {
             Console.WriteLine($"Handling event: {@event.GetType()}");
             foreach (var weather in @event.WeatherForecasts)
